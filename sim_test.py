@@ -1,7 +1,9 @@
 import numpy as np
 import datetime
 from matplotlib import pyplot as plt
+import concurrent.futures
 import pickle
+import collections
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -77,11 +79,11 @@ for i in range(m):
     data[:,i] = np.array(list(bin), dtype=int)
 
 ## run the program
-h = 0
-P_f = np.zeros([times, m])
+Times = np.arange(times)
+P_f = np.zeros(times)
 
-while (h < times):
-
+## define a function for multiprocessors
+def process_func(h):
     if h % 10000 == 0:
         print(f'{datetime.datetime.now()} Test No.{h} Complete!')
 
@@ -116,17 +118,15 @@ while (h < times):
             output[k] = 1
 
     ## read function complexity
-    P_f[h,:] = output
-    h = h + 1
+    P_f[h] = np.sum(output)
+
+## multiprocessing:
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    executor.map(process_func,Times)
 
 ## Plot P_f
-dic_func = {}
-for i in range(times):
-    Pf = np.ndarray.tostring(P_f[i,:])
-    dic_func[Pf] = count(P_f[i,:], P_f)/times
-    if i%1000==0:
-        print(f'{datetime.datetime.now()} Analyzed {i} results!')
-Y = np.array(list(dic_func.values()))
+T = collections.Counter(P_f)
+Y = np.array(list(T.values()))/times
 Y = np.sort(Y)
 Y = Y[::-1]
 t = len(Y)
@@ -140,4 +140,6 @@ plt.plot(X,Y)
 plt.plot(X,Z)
 plt.xscale('log')
 plt.yscale('log')
+plt.xlim([0, 10**12])
+plt.ylim([10**(-9), 1])
 plt.show()
