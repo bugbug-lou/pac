@@ -62,7 +62,7 @@ m = 2**n          ## number of data points
 k = 2**m           ## number of possible output functions
 layer_num = 2      ## number of layers of the neural network, user-defined
 neu = 40           ## neurons per layer
-times = int(2e7)       ## the times to run the program
+times = int(1e6)       ## the times to run the program
 var_w = 2.5 * (np.sqrt(n))   ## variance of weights
 var_b = 2.5                  ## variance of bias terms
 
