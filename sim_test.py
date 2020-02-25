@@ -1,6 +1,13 @@
 import numpy as np
 import datetime
 from matplotlib import pyplot as plt
+import pickle
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("MC")
+args = parser.parse_args()
+MC = args.MC
 
 def normalize(array):
     ## normalize an input array, each column of which represents a data point
@@ -54,7 +61,7 @@ m = 2**n          ## number of data points
 k = 2**m           ## number of possible output functions
 layer_num = 2      ## number of layers of the neural network, user-defined
 neu = 40           ## neurons per layer
-times = 10**5       ## the times to run the program
+times = int(2e7)       ## the times to run the program
 var_w = 2.5 * (np.sqrt(n))   ## variance of weights
 var_b = 2.5                  ## variance of bias terms
 
@@ -117,12 +124,18 @@ dic_func = {}
 for i in range(times):
     Pf = np.ndarray.tostring(P_f[i,:])
     dic_func[Pf] = count(P_f[i,:], P_f)/times
+    if i%1000==0:
+        print(f'{datetime.datetime.now()} Analyzed {i} results!')
 Y = np.array(list(dic_func.values()))
 Y = np.sort(Y)
 Y = Y[::-1]
 t = len(Y)
 X = np.arange(t)
 Z = (np.log(k) * X) ** (-1)
+np.save(f'X{MC}.npy', X)
+np.save(f'Y{MC}.npy', Y)
+np.save(f'Z{MC}.npy', Z)
+
 plt.plot(X,Y)
 plt.plot(X,Z)
 plt.xscale('log')
