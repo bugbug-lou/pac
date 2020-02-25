@@ -1,6 +1,7 @@
 import numpy as np
 import datetime
 from matplotlib import pyplot as plt
+import collections
 import pickle
 import argparse
 
@@ -44,15 +45,6 @@ def feed_forward_once(params, input, gamma):
     output = gamma * input
     return output
 
-def count(a, b):
-    ## a: an array
-    ## b: a matrix
-    ## the function counts the appearance of a as a row of b
-    count = 0
-    for i in range(np.shape(b)[0]):
-        if np.array_equal(a, b[i,:]):
-            count = count + 1
-    return count
 
 ##initialize parameters:
 ## parameter for NN
@@ -78,7 +70,7 @@ for i in range(m):
 
 ## run the program
 h = 0
-P_f = np.zeros([times, m])
+P_f = np.zeros(times)
 
 while (h < times):
 
@@ -116,17 +108,12 @@ while (h < times):
             output[k] = 1
 
     ## read function complexity
-    P_f[h,:] = output
+    P_f[h] = output
     h = h + 1
 
 ## Plot P_f
-dic_func = {}
-for i in range(times):
-    Pf = np.ndarray.tostring(P_f[i,:])
-    dic_func[Pf] = count(P_f[i,:], P_f)/times
-    if i%1000==0:
-        print(f'{datetime.datetime.now()} Analyzed {i} results!')
-Y = np.array(list(dic_func.values()))
+T = collections.Counter(P_f)
+Y = np.array(list(T.values()))/times
 Y = np.sort(Y)
 Y = Y[::-1]
 t = len(Y)
